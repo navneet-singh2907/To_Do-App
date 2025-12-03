@@ -1,6 +1,7 @@
 const addTodoBtn = document.getElementById('addTodoBtn');
 const inputTag = document.getElementById('todoInput');
 const todoList = document.getElementById('todoList');
+
 let todoText; // Variable to store the todo text when add button is clicked
 
 let todos = []; // Array to store todo items
@@ -22,21 +23,33 @@ const populateTodos = () => {
     todoList.innerHTML = todoList.innerHTML + string;
 }
 
-        addTodoBtn.addEventListener('click', () => {
-            console.log('Hey I just clicked')
-            todoText = inputTag.value;
-            console.log(todoText);
-            inputTag.value = '';
+addTodoBtn.addEventListener('click', () => {
+    console.log('Hey I just clicked')
+    todoText = inputTag.value;
+    console.log(todoText);
+    inputTag.value = '';
 
-            let todo = {
-                title: "" + todoText,
-                description: "This is a todo item",
+    let todo = {
+        title: "" + todoText,
+        description: "This is a todo item",
 
-                isCompleted: false
-            };
-            todos.push(todo);
-            localStorage.setItem('todos', JSON.stringify(todos));
-        });
+        isCompleted: false
+    };
+    todos.push(todo);
+    localStorage.setItem('todos', JSON.stringify(todos));
+});
+populateTodos();
 
+const todoCheckboxes = document.querySelectorAll('.todo-checkbox');
 
-        populateTodos();
+todoCheckboxes.forEach((element) => {
+    element.addEventListener('click', (e) => {
+        if(e.target.checked){
+            e.target.parentElement.classList.add('completed');
+        }   else{
+            e.target.parentElement.classList.remove('completed');
+        }
+
+    })          
+
+});
