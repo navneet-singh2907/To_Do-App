@@ -14,13 +14,13 @@ if (todoString) {
 const populateTodos = () => {
     let string = "";
     for (let item of todos) {
-        string += `<li class="todo-item" ${item.isCompleted ? 'completed' : ''}>
+        string += `<li id = "todo-${todo.id}" class="todo-item" ${item.isCompleted ? 'completed' : ''}>
                     <input type="checkbox" class="todo-checkbox" ${item.isCompleted ? 'checked' : ''}/>
                     <span class="todo-text">${item.title}</span>
                     <button class="delete-btn">×</button>
                 </li>`
     }
-    todoList.innerHTML = todoList.innerHTML + string;
+    todoList.innerHTML = string;
 }
 
 addTodoBtn.addEventListener('click', () => {
@@ -30,6 +30,7 @@ addTodoBtn.addEventListener('click', () => {
     inputTag.value = '';
 
     let todo = {
+        id: todos.length,
         title: "" + todoText,
         description: "This is a todo item",
 
@@ -37,6 +38,7 @@ addTodoBtn.addEventListener('click', () => {
     };
     todos.push(todo);
     localStorage.setItem('todos', JSON.stringify(todos));
+    populateTodos();
 });
 populateTodos();
 
@@ -44,12 +46,33 @@ const todoCheckboxes = document.querySelectorAll('.todo-checkbox');
 
 todoCheckboxes.forEach((element) => {
     element.addEventListener('click', (e) => {
-        if(e.target.checked){
+        if (e.target.checked) {
             e.target.parentElement.classList.add('completed');
-        }   else{
+
+            
+            todos = todos.map((todo) => {
+                if (("todo-" + todo.id) === element.parentNode.id) {
+                    todo.isCompleted = true;
+                }
+                else {
+                    return todo;
+                }
+            });
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+        else {
             e.target.parentElement.classList.remove('completed');
+            todos = todos.map((todo) => {
+                if (("todo-" + todo.id) === element.parentNode.id) {
+                    todo.isCompleted = true;
+                }
+                else {
+                    return todo;
+                }
+            });
+            localStorage.setItem('todos', JSON.stringify(todos));
         }
 
-    })          
+    })
 
 });
