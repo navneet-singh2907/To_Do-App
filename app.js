@@ -1,6 +1,8 @@
 const addTodoBtn = document.getElementById('addTodoBtn');
 const inputTag = document.getElementById('todoInput');
 const todoList = document.getElementById('todoList');
+const remaining = document.getElementById('remainingCount');
+const clearCompletedBtn = document.getElementById('clearCompletedBtn');
 
 let todoText; // Variable to store the todo text when add button is clicked 
 let todos = []; // Array to store todo items
@@ -8,13 +10,14 @@ let todos = []; // Array to store todo items
 let todoString = localStorage.getItem('todos');
 if (todoString) {
     todos = JSON.parse(todoString);
+    remaining.innerHTML = todos.filter(todo => !todo.isCompleted).length;
 }
 
 const populateTodos = () => {
     let string = "";
     for (const todo of todos) {
 
-        string += `<li id="todo-${todo.id}" class="todo-item ${todo.isCompleted ? 'completed' : ''}">
+        string += `<li id="${todo.id}" class="todo-item ${todo.isCompleted ? 'completed' : ''}">
                     <input type="checkbox" class="todo-checkbox" ${todo.isCompleted ? 'checked' : ''}/>
                     <span class="todo-text">${todo.title}</span>
                     <button class="delete-btn">×</button>
@@ -32,42 +35,63 @@ const populateTodos = () => {
 
 
                 todos = todos.map((todo) => {
-                    if (("todo-" + todo.id) == element.parentNode.id) {
+                    if ((todo.id) == element.parentNode.id) {
                         return { ...todo, isCompleted: true }
                     }
                     else {
                         return todo;
                     }
                 });
+                remaining.innerHTML = todos.filter(todo => !todo.isCompleted).length;
                 localStorage.setItem('todos', JSON.stringify(todos));
             }
             else {
                 e.target.parentElement.classList.remove('completed');
                 todos = todos.map((todo) => {
-                    if (("todo-" + todo.id) == element.parentNode.id) {
+                    if ((todo.id) == element.parentNode.id) {
                         return { ...todo, isCompleted: false }
                     }
                     else {
                         return todo;
                     }
                 });
+                remaining.innerHTML = todos.filter(todo => !todo.isCompleted).length;
                 localStorage.setItem('todos', JSON.stringify(todos));
             }
 
         })
 
     });
+    //clear completed button logic
+    clearCompletedBtn.addEventListener('click', () => {
+        todos = todos.filter((todo) => {    
+            if (todo.isCompleted == false) {
+                return todo;
+            }
+        });
+        remaining.innerHTML = todos.filter(todo => !todo.isCompleted).length;
+        localStorage.setItem('todos', JSON.stringify(todos));
+        populateTodos();
+    });
+
+    // delete button logic
+
     let deleteBtns = document.querySelectorAll('.delete-btn');
     deleteBtns.forEach((element) => {
         element.addEventListener('click', (e) => {
+            const confirmation = confirm("Are you sure you want to delete this todo?");
+            if (confirmation) {
             todos = todos.filter((todo) => {
-                return ("todo-" + todo.id) !== (e.target.parentNode.id);
+                return (todo.id) !== (e.target.parentNode.id);
             });
+            remaining.innerHTML = todos.filter(todo => !todo.isCompleted).length;
             localStorage.setItem('todos', JSON.stringify(todos));
             populateTodos();
+            }
 
         })
     });
+    
 
 }
     addTodoBtn.addEventListener('click', () => {
@@ -88,10 +112,12 @@ const populateTodos = () => {
             isCompleted: false
         };
         todos.push(todo);
+        remaining.innerHTML = todos.filter(todo => !todo.isCompleted).length;
 
         localStorage.setItem('todos', JSON.stringify(todos));
         populateTodos();
     });
     populateTodos();
+    remaining.innerHTML = todos.filter(todo => !todo.isCompleted).length;
 
 
