@@ -3,7 +3,9 @@ const inputTag = document.getElementById('todoInput');
 const todoList = document.getElementById('todoList');
 const remaining = document.getElementById('remainingCount');
 const clearCompletedBtn = document.getElementById('clearCompletedBtn');
+const filterContainer = document.querySelector('.filter-container'); 
 
+let currentFilter = 'all'; // Tracks which filter button is active: 'all', 'active', or 'completed'
 let todoText; // Variable to store the todo text when add button is clicked 
 let todos = []; // Array to store todo items
 //if we have the todos in the local storage then we will read them
@@ -15,7 +17,17 @@ if (todoString) {
 
 const populateTodos = () => {
     let string = "";
-    for (const todo of todos) {
+    let todosToRender = todos.filter(todo => {
+        if (currentFilter === 'active') {
+            return !todo.isCompleted;
+        } else if (currentFilter === 'completed') {
+            return todo.isCompleted;
+        }
+        return true; // 'all' filter
+    });
+     remaining.innerHTML = todos.filter(todo => !todo.isCompleted).length;
+
+    for (const todo of todosToRender) {
 
         string += `<li id="${todo.id}" class="todo-item ${todo.isCompleted ? 'completed' : ''}">
                     <input type="checkbox" class="todo-checkbox" ${todo.isCompleted ? 'checked' : ''}/>
@@ -105,7 +117,7 @@ const populateTodos = () => {
         inputTag.value = '';
 
         let todo = {
-            id: "todo-" + Date.now(),
+            id:  Date.now(),
             title: "" + todoText,
             description: "This is a todo item",
 
@@ -120,4 +132,22 @@ const populateTodos = () => {
     populateTodos();
     remaining.innerHTML = todos.filter(todo => !todo.isCompleted).length;
 
+    // --- Event Listener for Filter Buttons ---
+filterContainer.addEventListener('click', (event) => {
+    const target = event.target;
+    if (target.classList.contains('filter-btn')) {
+        const newFilter = target.getAttribute('data-filter');
 
+        if (newFilter === currentFilter) return; 
+
+        currentFilter = newFilter;
+
+        // Update 'active' class visually
+        filterContainer.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        target.classList.add('active');
+
+        populateTodos();
+    }
+});
